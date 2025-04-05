@@ -3,11 +3,12 @@ import sys
 from modules.front_menu import *
 from modules.game import *
 
-player1, player2 = player_names()
+players =["a", "b"]
+# players = player_names()
 
-start_button()
+# start_button()
 
-game = Game(player1, player2)
+game = run_game(players)
 
 game.run()
 pg.quit()

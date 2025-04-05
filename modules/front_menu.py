@@ -4,19 +4,18 @@ import sys
 pg.init()
 
 screen = pg.display.set_mode((1000, 600), pg.RESIZABLE)
-
+pg.display.set_caption("Angry Birds v2.0")
 front_bg_image = pg.image.load("media/images/front_background.jpg")
 front_bg_image = pg.transform.scale(front_bg_image, (1000, 600))
 
 font = pg.font.Font(None, 36)
 font_heading = pg.font.Font(None, 42)
 def player_names():
+    screen.blit(front_bg_image, (0, 0))
     players = []
     name = ""
     running = True
     while running:
-        screen.blit(front_bg_image, (0, 0))
-
         if len(players) == 0:
           statement = "Enter the name of the first player :"
         else:
@@ -52,10 +51,10 @@ def player_names():
     return players
 
 def start_button() :
+  screen.blit(front_bg_image, (0, 0))
+
   running =  True
   while running :
-    screen.blit(front_bg_image, (0, 0))
-
     coordinates = pg.Rect(400, 275, 200, 50)
 
     color = (0, 124, 124) if coordinates.collidepoint(pg.mouse.get_pos()) else (0, 62, 62)
