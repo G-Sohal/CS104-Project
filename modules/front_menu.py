@@ -11,11 +11,11 @@ front_bg_image = pg.transform.scale(front_bg_image, (1000, 600))
 font = pg.font.Font(None, 36)
 font_heading = pg.font.Font(None, 42)
 def player_names():
-    screen.blit(front_bg_image, (0, 0))
     players = []
     name = ""
     running = True
     while running:
+        screen.blit(front_bg_image, (0, 0))
         if len(players) == 0:
           statement = "Enter the name of the first player :"
         else:
