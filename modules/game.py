@@ -1,21 +1,26 @@
 import pygame as pg
 import sys, random, math
-from modules.game_objects import *
+from modules.game_objects.block import *
+from modules.game_objects.catapult import *
+from modules.game_objects.fortress import *
+from modules.game_objects.bird import *
+from modules.game_over import ranking
+from data.constants import *
 
 pg.init()
 
-screen = pg.display.set_mode((1000, 600), pg.RESIZABLE)
 pg.display.set_caption("Angry Birds v2.0")
-background_image = pg.image.load("media/images/background.png")
-background_image = pg.transform.scale(background_image, (1000, 600))
+
+(w, h) = (70, 70)
+button_rect = pg.Rect((10, 10), (w, h))
+reload_rect = pg.Rect((70, 10), (w, h))
+ranking_rect = pg.Rect((130, 10), (w, h))
 
 clock = pg.time.Clock()
 
-font = pg.font.Font(None, 36)
-
 def run_game(players):
   catapults = [Catapult(200, 450, "left"), Catapult(740, 450, "right")]
-  fortresses = [Fortress(10, 400, 5), Fortress(840, 400, 5)]
+  fortresses = [Fortress(10, 350, 3, 5), Fortress(840, 350, 3, 5)]
     
   birds = [None, None]
   score = [0, 0]
@@ -23,9 +28,13 @@ def run_game(players):
 
   dragging = False
   running = True
+  game_over = False
 
   while running:
     screen.blit(background_image, (0, 0))
+    screen.blit(pause_button, button_rect.topleft)
+    screen.blit(reload_button, reload_rect.topleft)
+    screen.blit(ranking_button, ranking_rect.topleft)
 
     catapults[0].construct(screen)
     catapults[1].construct(screen)
@@ -51,20 +60,54 @@ def run_game(players):
         if bird.rect.colliderect(block.rect) :
           damage = bird.damage(block.type)
           if block.hit(damage) :
+            fortresses[1-turn].existing_blocks[block.row, block.col] = False
             fortresses[1-turn].blocks.remove(block)
+
+            for b in fortresses[1-turn].blocks:
+              if b.row == block.row and b.col <= block.col:
+                b.falling = True
+
             score[turn] += 1
           birds[turn] = None
           turn = 1 - turn
           break
-      if (bird.rect.y > 600 or bird.rect.x < 0 or bird.rect.x > 1000) and bird.is_launched :
+      if (bird.rect.y > 550 or bird.rect.x < 0 or bird.rect.x > 1000) and bird.is_launched :
         birds[turn] = None
         turn = 1 - turn
         
       for event in pg.event.get() :
-        if event.type == pg.QUIT :
+
+        if event.type == pg.QUIT:
           running = False
+        
         elif event.type == pg.MOUSEBUTTONDOWN :
-          if bird and not bird.is_launched :
+          if button_rect.collidepoint(pg.mouse.get_pos()):
+            screen.blit(resume_button, button_rect.topleft)
+            paused = True 
+            while paused:
+              for event in pg.event.get():
+                  if event.type == pg.QUIT:
+                      running = False
+                      paused = False
+                  elif event.type == pg.MOUSEBUTTONDOWN:
+                      if button_rect.collidepoint(pg.mouse.get_pos()):
+                          screen.blit(pause_button, button_rect.topleft)
+                          paused = False
+              pg.display.flip()
+              clock.tick(30)
+          elif reload_rect.collidepoint(pg.mouse.get_pos()):
+              catapults = [Catapult(200, 450, "left"), Catapult(740, 450, "right")]
+              fortresses = [Fortress(10, 400, 3, 5), Fortress(840, 400, 3, 5)]
+                
+              birds = [None, None]
+              score = [0, 0]
+              turn = 0
+              continue
+          elif ranking_rect.collidepoint(pg.mouse.get_pos()):
+            game_over = True
+            running = False
+            ranking(players, score[0], score[1])
+          elif bird and not bird.is_launched :
             drag_start = pg.mouse.get_pos()
             dragging = True
         elif event.type == pg.MOUSEMOTION:
@@ -89,8 +132,12 @@ def run_game(players):
             sling_x, sling_y = catapults[turn].rect.centerx, catapults[turn].rect.top + 30
             pg.draw.line(screen, (139, 69, 19), (sling_x - 10, sling_y), bird.rect.center, 5)
             pg.draw.line(screen, (139, 69, 19), (sling_x + 10, sling_y), bird.rect.center, 5)
-    
+
       pg.display.flip()
       clock.tick(60)
+  
+  if game_over :
+    ranking(players, score[0], score[1])
+  
   pg.quit()
   sys.exit()        
