@@ -24,12 +24,14 @@ def player_names():
         statement_surface = font_heading.render(statement, True, "black")
         screen.blit(statement_surface, (300, 220))
 
-        coordinates = pg.Rect(400, 275, 200, 50)
+        name_surface = font.render(name, True, "black")
+        text_width = max(name_surface.get_width(), 150)
+        box_width = text_width + 20
+        coordinates = pg.Rect(500 - box_width // 2, 275, box_width, 50)
+
 
         color = (0, 124, 124) if len(name) == 0 else (0, 200, 200)
         pg.draw.rect(screen, color, coordinates, border_radius=5)
-
-        name_surface = font.render(name, True, "black")
         screen.blit(name_surface, name_surface.get_rect(center=coordinates.center))
 
         pg.display.flip()
@@ -49,6 +51,35 @@ def player_names():
                 else:
                     name += event.unicode
     return players
+
+def mode() :
+  screen.blit(front_bg_image, (0, 0))
+
+  running = True
+  while running :
+    coordinates_mode1 = pg.Rect(400, 275, 200, 50)
+    coordinates_mode2 = pg.Rect(400, 350, 200, 50)
+    for coordinates in (coordinates_mode1, coordinates_mode2) :
+      color = (0, 124, 124) if coordinates.collidepoint(pg.mouse.get_pos()) else (0, 62, 62)
+      pg.draw.rect(screen, color, coordinates, border_radius=10)
+
+    mode_1_text = font_heading.render("MODE 1", True, "black")
+    screen.blit(mode_1_text, mode_1_text.get_rect(center=coordinates_mode1.center))
+    mode_2_text = font_heading.render("MODE 2", True, "black")
+    screen.blit(mode_2_text, mode_2_text.get_rect(center=coordinates_mode2.center))
+
+    pg.display.flip()
+
+    for event in pg.event.get() :
+      if event.type == pg.QUIT :
+        pg.quit()
+        sys.exit()
+      elif event.type == pg.MOUSEBUTTONDOWN :
+        if coordinates_mode1.collidepoint(event.pos):
+          return 1
+        elif coordinates_mode2.collidepoint(event.pos):
+          return 2
+        running = False
 
 def start_button() :
   screen.blit(front_bg_image, (0, 0))

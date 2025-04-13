@@ -44,14 +44,15 @@ bird_images = {
     "Red": "media/images/birds/red.png",
     "Chuck": "media/images/birds/chuck.png",
     "Blues": "media/images/birds/blue.png",
-    "Bomb": "media/images/birds/bomb.png"
+    "Bomb": "media/images/birds/bomb.png",
+    "Bomb_special": "media/images/birds/bomb_special.png",
 }
 
 bird_speeds = {
-    "Red" : 20,
-    "Chuck" : 32,
-    "Blues" : 25,
-    "Bomb" : 17
+    "Red" : 23,
+    "Chuck" : 23,
+    "Blues" : 23,
+    "Bomb" : 22
 }
 
 block_damage = {
@@ -66,14 +67,13 @@ block_damage = {
 # mention other global variables
 
 # TO -DO :
-# - add a pause button
-# - add a restart button
+'''HIGH PRIORITY'''
 # - letting blues split into 3
-# - let fortress experience gravity
 # - let birds not be able to go through blocks when string is pulled onto the other side
 # - let birds bounce - make bird.velocityy be negative when it hits the ground
-# - add a background music
+'''MEDIUM PRIORITY'''
 # - add trail to birds projectile - if speeded up then dots be conjusted or check accordingly
+'''LOW PRIORITY'''
 # - modularise code a bit more...
-
+# - add a background music ?
 # - make arenas with different backgrounds, fortress block types, and catapult types
