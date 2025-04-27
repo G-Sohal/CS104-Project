@@ -1,27 +1,40 @@
 import pygame as pg
-screen = pg.display.set_mode((1000, 600), pg.RESIZABLE)
+screen_width = 1080
+screen_height = 630
+screen = pg.display.set_mode((screen_width, screen_height), pg.RESIZABLE)
 
 font = pg.font.Font(None, 36)
+font_heading = pg.font.Font(None, 42)
 
 background_image = pg.image.load("media/images/background.png")
-background_image = pg.transform.scale(background_image, (1000, 600))
+background_image = pg.transform.scale(background_image, screen.get_size())
 
 game_over_background = pg.image.load("media/images/background.png")
-game_over_background = pg.transform.scale(game_over_background, (1000, 600))
+game_over_background = pg.transform.scale(game_over_background, screen.get_size())
+
+front_bg_image = pg.image.load("media/images/front_background.jpg")
+front_bg_image = pg.transform.scale(front_bg_image, (screen_width, screen_height))
+
+(w, h) = (80, 80)
 
 reload_button = pg.image.load("media/images/buttons/reload.png")
-reload_button = pg.transform.scale(reload_button, (70, 70))
+reload_button = pg.transform.scale(reload_button, (w, h))
 pause_button = pg.image.load("media/images/buttons/pause.png")
-pause_button = pg.transform.scale(pause_button, (70, 70))
+pause_button = pg.transform.scale(pause_button, (w, h))
 resume_button = pg.image.load("media/images/buttons/resume.png")
-resume_button = pg.transform.scale(resume_button, (70, 70))
+resume_button = pg.transform.scale(resume_button, (w, h))
 reload_button = pg.image.load("media/images/buttons/reload.png")
-reload_button = pg.transform.scale(reload_button, (70, 70))
+reload_button = pg.transform.scale(reload_button, (w, h))
 ranking_button = pg.image.load("media/images/buttons/ranking.png")
-ranking_button = pg.transform.scale(ranking_button, (70, 70))
+ranking_button = pg.transform.scale(ranking_button, (w, h))
+# settings_button = pg.image.load("media/images/buttons/settings.png")
+
+button_rect = pg.Rect((10, 10), (w, h))
+reload_rect = pg.Rect((70, 10), (w, h))
+ranking_rect = pg.Rect((130, 10), (w, h))
 
 gravity = 0.5
-drag = 0.1
+drag = 0.5
 
 block_images = {
     "wood": { "1": "media/images/blocks/wood100.png", "0.8": "media/images/blocks/wood80.png", "0.6": "media/images/blocks/wood60.png", "0.4": "media/images/blocks/wood40.png", "0.2": "media/images/blocks/wood20.png" },
@@ -48,6 +61,17 @@ bird_images = {
     "Bomb_special": "media/images/birds/bomb_special.png",
 }
 
+bird_images_motion = {
+    "Red": "media/images/birds/red.png",
+    "Chuck": "media/images/birds/chuck.png",
+    "Blues": "media/images/birds/blue.png",
+    "Bomb": "media/images/birds/bomb.png",
+}
+
+bird_images_hit = {
+    
+}
+
 bird_speeds = {
     "Red" : 23,
     "Chuck" : 23,
@@ -62,17 +86,22 @@ block_damage = {
     "Bomb": {"wood": 0.20, "ice": 0.15, "stone": 0.40}
 }
 
+red_feather = pg.image.load("media/images/red_feather.png").convert_alpha()
+red_feather = pg.transform.scale(red_feather, (screen_width//50, screen_width//50))
+red_feathers = [
+    red_feather,
+    pg.transform.flip(red_feather, True, False),
+]
 
+bomb_damage = pg.image.load("media/images/bomb_damage.png").convert_alpha()
 # make screen_height and screen_width be gloabl and independant -- not so hard-coded
 # mention other global variables
 
 # TO -DO :
 '''HIGH PRIORITY'''
-# - letting blues split into 3
-# - let birds not be able to go through blocks when string is pulled onto the other side
+# - moving blocks customization
 # - let birds bounce - make bird.velocityy be negative when it hits the ground
 '''MEDIUM PRIORITY'''
-# - add trail to birds projectile - if speeded up then dots be conjusted or check accordingly
 '''LOW PRIORITY'''
 # - modularise code a bit more...
 # - add a background music ?

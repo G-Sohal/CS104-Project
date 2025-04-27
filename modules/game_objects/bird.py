@@ -1,4 +1,5 @@
 import pygame as pg
+import math
 from data.constants import *
 
 class Bird:
@@ -8,7 +9,7 @@ class Bird:
         self.image = pg.image.load(bird_images[type]).convert_alpha()
         self.image = pg.transform.scale(self.image, (50, 50))
         self.image = pg.transform.flip(self.image, turn, False)
-
+        self.original_image = self.image
         self.rect = self.image.get_rect(topleft=(x, y))
         self.speed = bird_speeds[type]
         self.velocityx = 0
@@ -17,11 +18,16 @@ class Bird:
         self.special_effect_used = False # for new Blues created
         self.damage = block_damage[type] # dict item is callable
 
-    def update(self):
+    def update(self, level):
         if self.is_launched:
             self.velocityy += gravity
-            self.rect.x += self.velocityx
+            self.rect.x += self.velocityx - int(bool(level))
             self.rect.y += self.velocityy
+            
+            self.angle = math.degrees(math.atan2(-self.velocityy, self.velocityx))
+            self.angle = max(min(self.angle, 30), -30)
+
+            self.image = pg.transform.rotate(self.original_image, -self.angle)
 
     def draw(self, screen):
         screen.blit(self.image, self.rect.topleft)
@@ -34,24 +40,24 @@ class Bird:
                 self.velocityy *= 2
                 return (self,)
             elif self.type == "Blues" :
-                blue_copy = Bird(self.rect.x - 20, self.rect.y + 50, "Blues", self.turn)
-                blue_copy_2 = Bird(self.rect.x + 30, self.rect.y - 50, "Blues", self.turn)
-                blue_copy.velocityx = self.velocityx
-                blue_copy.velocityy = self.velocityy
-                blue_copy_2.velocityx = self.velocityx
-                blue_copy_2.velocityy = self.velocityy
+                blue_copy = Bird(self.rect.x, self.rect.y, "Blues", self.turn)
+                blue_copy_2 = Bird(self.rect.x, self.rect.y, "Blues", self.turn)
+                blue_copy.velocityx = self.velocityx - 5
+                blue_copy.velocityy = self.velocityy + 5
+                blue_copy_2.velocityx = self.velocityx + 5
+                blue_copy_2.velocityy = self.velocityy - 5
                 blue_copy.is_launched = True
                 blue_copy_2.is_launched = True
                 blue_copy.special_effect_used = True
                 blue_copy_2.special_effect_used = True
                 return (self, blue_copy, blue_copy_2)
             elif self.type == "Bomb" :
-                self.damage = {"wood": 0.40, "ice": 0.80, "stone": 0.40}
+                self.damage = {"wood": 0.80, "ice": 0.80, "stone": 0.90}
                 self.image = pg.image.load(bird_images["Bomb_special"]).convert_alpha()
                 self.image = pg.transform.scale(self.image, (50, 50))
                 self.image = pg.transform.flip(self.image, self.turn, False)
+                self.original_image = self.image
                 return (self,)
             elif self.type == "Red" :
-                self.rect.x += 50
-                self.rect.y -= 50
+                self.velocityx *= 2
                 return (self,)

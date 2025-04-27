@@ -5,7 +5,7 @@ import random, math
 from data.constants import *
 
 class Block :
-    def __init__(self, x, y, type, row, col) :
+    def __init__(self, x, y, type, row, col, moving) :
         self.type = type
         self.row = row
         self.col = col
@@ -16,6 +16,10 @@ class Block :
         self.image = pg.transform.scale(self.image, (50, 50))
         self.velocity_y = 0
         self.falling = False
+        self.moving = moving
+        self.delta_x = 0
+        self.delta_y = 0
+        self.dir = 1
 
     def construct(self, screen) :
         screen.blit(self.image, self.rect.topleft)
@@ -49,5 +53,19 @@ class Block :
         
     def update(self) :
         if self.falling:
-            self.rect.y += 50
-            self.falling = False
+            self.rect.y += 5
+            self.delta_y += 5
+            if self.delta_y >= 50 :
+                self.falling = False
+                self.delta_y = 0
+        if self.moving:
+            if self.delta_x <= -50:
+                self.dir = 1
+                self.delta_x = -50
+            elif self.delta_x >= 50:
+                self.dir = -1
+                self.delta_x = 50
+            self.rect.x += 2 * self.dir
+            self.delta_x += 2 * self.dir
+            # pg.time.wait()
+            
