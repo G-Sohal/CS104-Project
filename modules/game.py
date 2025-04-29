@@ -10,7 +10,7 @@ from data import constants
 class Game :
     clock = pg.time.Clock()
 
-    def __init__(self, players, mode, level, rows, cols):
+    def __init__(self, players, mode, level, rows, cols, method):
         self.players = players
         self.mode = mode
         self.level = level
@@ -21,6 +21,22 @@ class Game :
         self.fortresses = [Fortress(90, constants.ground - 50*(cols + 1), rows, cols, self.moving), Fortress(constants.screen_width - 90 - 50*rows, constants.ground - 50*(cols + 1), rows, cols, self.moving)]
         self.birds = [None, None]
         self.bird_list = []
+        self.deck = {
+            0 : random.choices(["Red", "Chuck", "Bomb", "Blues"], k=3),
+            1 : random.choices(["Red", "Chuck", "Bomb", "Blues"], k=3),
+        }
+        self.card_rects = {
+            0: [
+                pg.Rect(50, constants.ground + 5, constants.cw, constants.ch),
+                pg.Rect(150, constants.ground + 5, constants.cw, constants.ch),
+                pg.Rect(250, constants.ground + 5, constants.cw, constants.ch),
+            ],
+            1: [
+                pg.Rect(constants.screen_width - 300, constants.ground + 5, constants.w, constants.ch),
+                pg.Rect(constants.screen_width - 200, constants.ground + 5, constants.w, constants.ch),
+                pg.Rect(constants.screen_width - 100, constants.ground + 5, constants.w, constants.ch),
+            ],
+        }
         self.score = [0, 0]
         self.initial_turn = random.randint(0, 1)
         self.turn = self.initial_turn
@@ -32,6 +48,7 @@ class Game :
         self.start_time = pg.time.get_ticks()
         self.pause_time = 0
         constants.background_image = pg.transform.scale(constants.background_image, screen.get_size())
+        self.method = method
 
     def run(self):
         while self.running:
@@ -63,10 +80,14 @@ class Game :
             if self.birds[self.turn] is None:
                 self.projectile_coordinates = []
                 self.special_effect_coordinates = []
-                x = self.catapults[self.turn].rect.centerx - 25
-                y = self.catapults[self.turn].rect.top - 10
-                self.birds[self.turn] = Bird(x, y, random.choice(["Red", "Chuck", "Blues", "Bomb",]), self.turn)
-                self.bird_list.append(self.birds[self.turn])
+                if self.method :
+                    for i, bird in enumerate(self.deck[self.turn]) :
+                        constants.screen.blit(constants.card_images[bird], self.card_rects[self.turn][i])
+                else :
+                    x = self.catapults[self.turn].rect.centerx - 25
+                    y = self.catapults[self.turn].rect.top - 10
+                    self.birds[self.turn] = Bird(x, y, random.choice(["Red", "Chuck", "Blues", "Bomb",]), self.turn)
+                    self.bird_list.append(self.birds[self.turn])
 
             for bird in self.bird_list:
                 if bird.special_effect_used: self.special_effect_coordinates.append(bird.rect.center)
@@ -103,7 +124,7 @@ class Game :
                 if len(active_birds) == 0 and self.birds[self.turn] is not None:
                     self.birds[self.turn] = None
                     self.turn = 1 - self.turn
-            # Check for fortress destruction
+            
             if not self.fortresses[0].blocks:
                 ranking(self.players, self.score[0], self.score[1], True)
                 self.running = False
@@ -120,16 +141,17 @@ class Game :
                     constants.ground = event.h * 0.87
                     constants.screen = pg.display.set_mode((event.w, event.h), pg.RESIZABLE)
                     constants.background_image = pg.transform.scale(constants.background_image, (event.w, event.h))
-                    
-                    self.catapults[0].rect.x = 90 + self.cols * 50
-                    self.catapults[0].rect.y = constants.ground
-                    self.catapults[1].rect.x = constants.screen_width - 150 - 50 * self.cols
-                    self.catapults[1].rect.y = constants.ground
+                    constants.music_rect = pg.Rect((constants.screen_width-80, 10), (constants.w, constants.h))
+
+                    self.catapults[0].rect.x = 150 + 50*self.rows
+                    self.catapults[0].rect.bottom = constants.ground
+                    self.catapults[1].rect.x = constants.screen_width - 220 - 50*self.rows
+                    self.catapults[1].rect.bottom = constants.ground
 
                     self.birds[self.turn].rect.topleft = (self.catapults[self.turn].rect.centerx - 25, self.catapults[self.turn].rect.top - 10)
-                    
-                    self.fortresses[0].set_position(20, constants.ground - self.cols * 50)
-                    self.fortresses[1].set_position(constants.screen_width - 20 - 50 * self.cols, constants.ground - self.cols * 50)
+
+                    self.fortresses[0].set_position(90, constants.ground - 50*(self.cols + 1))
+                    self.fortresses[1].set_position(constants.screen_width - 90 - 50 * self.rows, constants.ground - 50*(self.cols + 1))
 
                     self.dragging = False
                 elif event.type == pg.MOUSEBUTTONDOWN:
@@ -180,6 +202,15 @@ class Game :
                     elif self.birds[self.turn] and not self.birds[self.turn].is_launched:
                         self.drag_start = self.birds[self.turn].rect.center
                         self.dragging = True
+                    elif not self.dragging and self.birds[self.turn] is None and self.method:
+                        for i, rect in enumerate(self.card_rects[self.turn]) :
+                            if rect.collidepoint(event.pos) :
+                                selected_bird = self.deck[self.turn][i]
+                                new_bird = Bird(self.catapults[self.turn].rect.centerx - 25, self.catapults[self.turn].rect.top - 10, selected_bird, self.turn)
+                                self.birds[self.turn] = new_bird
+                                self.bird_list.append(new_bird)
+                                self.deck[self.turn][i] = random.choice(["Red", "Chuck", "Bomb", "Blues"])
+                                break
                 elif event.type == pg.MOUSEMOTION:
                     if self.dragging and self.birds[self.turn] and not self.birds[self.turn].is_launched:
                         current_pos = pg.mouse.get_pos()

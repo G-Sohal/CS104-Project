@@ -48,6 +48,7 @@ class FrontMenu :
                         constants.screen_height = event.h
                         constants.screen = pg.display.set_mode((event.w, event.h), pg.RESIZABLE)
                         constants.front_bg_image = pg.transform.scale(constants.front_bg_image, (event.w, event.h))
+                        constants.music_rect = pg.Rect((constants.screen_width-80, 10), (constants.w, constants.h))
                     elif event.type == pg.MOUSEBUTTONDOWN :
                         if coordinates_rows.collidepoint(event.pos) :
                             dim = "rows"
@@ -119,6 +120,7 @@ class FrontMenu :
                     constants.screen_height = event.h
                     constants.screen = pg.display.set_mode((event.w, event.h), pg.RESIZABLE)
                     constants.front_bg_image = pg.transform.scale(constants.front_bg_image, (event.w, event.h))
+                    constants.music_rect = pg.Rect((constants.screen_width-80, 10), (constants.w, constants.h))
                 elif event.type == pg.KEYDOWN:
                     if event.key == pg.K_RETURN:
                         if len(name) : players.append(name)
@@ -178,11 +180,12 @@ class FrontMenu :
                     constants.screen_height = event.h
                     constants.screen = pg.display.set_mode((event.w, event.h), pg.RESIZABLE)
                     constants.front_bg_image = pg.transform.scale(constants.front_bg_image, (event.w, event.h))
+                    constants.music_rect = pg.Rect((constants.screen_width-80, 10), (constants.w, constants.h))
                 elif event.type == pg.MOUSEBUTTONDOWN:
                     if coordinates[0].collidepoint(event.pos):
-                        return 1
+                        return 0
                     elif coordinates[1].collidepoint(event.pos):
-                        return 2
+                        return 1
                     elif constants.music_rect.collidepoint(pg.mouse.get_pos()):
                         if pg.mixer.music.get_busy():
                             pg.mixer.music.pause()
@@ -246,6 +249,7 @@ class FrontMenu :
                     constants.screen_height = event.h
                     constants.screen = pg.display.set_mode((event.w, event.h), pg.RESIZABLE)
                     constants.front_bg_image = pg.transform.scale(constants.front_bg_image, (event.w, event.h))
+                    constants.music_rect = pg.Rect((constants.screen_width-80, 10), (constants.w, constants.h))
                 elif event.type == pg.MOUSEBUTTONDOWN:
                     if coordinates[0].collidepoint(event.pos):
                         return 0
@@ -269,7 +273,7 @@ class FrontMenu :
         running =  True
         while running :
             constants.screen.blit(constants.front_bg_image, (0, 0))
-            constants.screen.blit(constants.angry_birds_logo, (constants.screen_width*0.1, 20))
+            constants.screen.blit(constants.angry_birds_logo, (constants.screen_width*0.2, 30))
             constants.screen.blit(constants.music_button[int(constants.music)], constants.music_rect.topleft)
             play_button_rect = constants.play_button.get_rect(center=(constants.screen_width // 2, constants.screen_height // 2))
             constants.screen.blit(constants.play_button, play_button_rect)
@@ -285,7 +289,8 @@ class FrontMenu :
                     constants.screen_height = event.h
                     constants.screen = pg.display.set_mode((event.w, event.h), pg.RESIZABLE)
                     constants.front_bg_image = pg.transform.scale(constants.front_bg_image, (event.w, event.h))
-                    constants.angry_birds_logo = pg.transform.scale(constants.angry_birds_logo, (event.w*0.75, event.h//3))
+                    constants.angry_birds_logo = pg.transform.scale(constants.angry_birds_logo, (event.w*0.6, event.h//3))
+                    constants.music_rect = pg.Rect((constants.screen_width-80, 10), (constants.w, constants.h))
                 elif event.type == pg.MOUSEBUTTONDOWN :
                     if play_button_rect.collidepoint(event.pos):
                         running = False
@@ -297,3 +302,55 @@ class FrontMenu :
                             pg.mixer.music.unpause()    
                             constants.music = True  
 
+    def method(self) :
+        constants.screen.blit(constants.front_bg_image, (0, 0))
+        constants.screen.blit(constants.music_button[int(constants.music)], constants.music_rect.topleft)
+        mode_text = [
+            constants.font_heading.render("RANDOM DRAW", True, "black"),
+            constants.font_heading.render("DECK MODE", True, "black")
+        ]
+        coordinates = [None, None]
+        running = True
+
+        while running:
+            constants.screen.blit(constants.front_bg_image, (0, 0))
+            constants.screen.blit(constants.music_button[int(constants.music)], constants.music_rect.topleft)
+
+            coordinates[0] = pg.Rect(constants.screen_width//2 - (mode_text[0].get_width())//2 - 10,
+                                constants.screen_height//2 - mode_text[0].get_height() - 100, 
+                                mode_text[0].get_width() + 20, 
+                                mode_text[0].get_height() + 20)
+            coordinates[1] = pg.Rect(constants.screen_width//2 - (mode_text[1].get_width())//2 - 10,
+                                constants.screen_height//2 + mode_text[1].get_height() + 100, 
+                                mode_text[1].get_width() + 20, 
+                                mode_text[1].get_height() + 20)
+
+            for i in range(2):
+                color = (63, 191, 127) if coordinates[i].collidepoint(pg.mouse.get_pos()) else (45, 169, 106)
+                pg.draw.rect(constants.screen, color, (coordinates[i]), border_radius=10)
+                constants.screen.blit(mode_text[i], (coordinates[i].x + 10, coordinates[i].y + 10))
+
+            pg.display.flip()
+
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    sys.exit()
+                elif event.type == pg.VIDEORESIZE :
+                    constants.screen_width = event.w
+                    constants.screen_height = event.h
+                    constants.screen = pg.display.set_mode((event.w, event.h), pg.RESIZABLE)
+                    constants.front_bg_image = pg.transform.scale(constants.front_bg_image, (event.w, event.h))
+                    constants.music_rect = pg.Rect((constants.screen_width-80, 10), (constants.w, constants.h))
+                elif event.type == pg.MOUSEBUTTONDOWN:
+                    if coordinates[0].collidepoint(event.pos):
+                        return 1
+                    elif coordinates[1].collidepoint(event.pos):
+                        return 2
+                    elif constants.music_rect.collidepoint(pg.mouse.get_pos()):
+                        if pg.mixer.music.get_busy():
+                            pg.mixer.music.pause()
+                            constants.music = False
+                        else:
+                            pg.mixer.music.unpause()    
+                            constants.music = True  

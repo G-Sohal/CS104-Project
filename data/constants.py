@@ -7,7 +7,7 @@ font = pg.font.Font("media/fonts/angrybirds.ttf", 36)
 font_heading = pg.font.Font("media/fonts/angrybirds.ttf", 42)
 
 angry_birds_logo = pg.image.load("media/images/logo.png")
-angry_birds_logo = pg.transform.scale(angry_birds_logo, (screen_width*0.8, screen_height//3))
+angry_birds_logo = pg.transform.scale(angry_birds_logo, (screen_width*0.6, screen_height//3))
 
 background_image = pg.image.load("media/images/background1.jpg")
 background_image = pg.transform.scale(background_image, screen.get_size())
@@ -52,7 +52,7 @@ music_rect = pg.Rect((screen_width-80, 10), (w, h))
 ground = screen_height * 0.87 ## check
 
 gravity = 0.5
-drag = 0.15
+drag = 0.1
 
 block_images = {
     "wood": { "1": "media/images/blocks/wood100.png", "0.8": "media/images/blocks/wood80.png", "0.6": "media/images/blocks/wood60.png", "0.4": "media/images/blocks/wood40.png", "0.2": "media/images/blocks/wood20.png" },
@@ -88,6 +88,23 @@ bird_images_motion = {
 
 bird_images_hit = {
     
+}
+
+cw, ch = 60, 90
+red_card = pg.image.load("media/images/cards/red_card.png")
+red_card = pg.transform.scale(red_card, (cw, ch))
+chuck_card = pg.image.load("media/images/cards/chuck_card.png")
+chuck_card = pg.transform.scale(chuck_card, (cw, ch))
+blues_card = pg.image.load("media/images/cards/blues_card.png")
+blues_card = pg.transform.scale(blues_card, (cw, ch))
+bomb_card = pg.image.load("media/images/cards/bomb_card.png")
+bomb_card = pg.transform.scale(bomb_card, (cw, ch))
+
+card_images = {
+    "Red" : red_card,
+    "Chuck" : chuck_card,
+    "Blues" : blues_card,
+    "Bomb" : bomb_card,
 }
 
 bird_speeds = {
