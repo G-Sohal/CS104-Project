@@ -1,19 +1,28 @@
 import pygame as pg
-screen_width = 1080
-screen_height = 630
+screen_width = 1500
+screen_height = 800
 screen = pg.display.set_mode((screen_width, screen_height), pg.RESIZABLE)
 
-font = pg.font.Font(None, 36)
-font_heading = pg.font.Font(None, 42)
+font = pg.font.Font("media/fonts/angrybirds.ttf", 36)
+font_heading = pg.font.Font("media/fonts/angrybirds.ttf", 42)
 
-background_image = pg.image.load("media/images/background.png")
+angry_birds_logo = pg.image.load("media/images/logo.png")
+angry_birds_logo = pg.transform.scale(angry_birds_logo, (screen_width*0.8, screen_height//3))
+
+background_image = pg.image.load("media/images/background1.jpg")
 background_image = pg.transform.scale(background_image, screen.get_size())
 
-game_over_background = pg.image.load("media/images/background.png")
+game_over_background = pg.image.load("media/images/background1.jpg")
 game_over_background = pg.transform.scale(game_over_background, screen.get_size())
 
-front_bg_image = pg.image.load("media/images/front_background.jpg")
+front_bg_image = pg.image.load("media/images/background1.jpg")
 front_bg_image = pg.transform.scale(front_bg_image, (screen_width, screen_height))
+
+pg.mixer.init()
+pg.mixer.music.load("media/sounds/theme_song.ogg")
+pg.mixer.music.play(-1) 
+pg.mixer.music.set_volume(0.7)
+music = True
 
 (w, h) = (80, 80)
 
@@ -27,14 +36,23 @@ reload_button = pg.image.load("media/images/buttons/reload.png")
 reload_button = pg.transform.scale(reload_button, (w, h))
 ranking_button = pg.image.load("media/images/buttons/ranking.png")
 ranking_button = pg.transform.scale(ranking_button, (w, h))
-# settings_button = pg.image.load("media/images/buttons/settings.png")
+music_on_button = pg.image.load("media/images/buttons/music.png")
+music_on_button = pg.transform.scale(music_on_button, (w, h))
+music_off_button = pg.image.load("media/images/buttons/music_off.png")
+music_off_button = pg.transform.scale(music_off_button, (w, h))
+music_button = [music_off_button, music_on_button]
+play_button =  pg.image.load("media/images/buttons/play.png")
+play_button = pg.transform.scale(play_button, (200, 150))
 
 button_rect = pg.Rect((10, 10), (w, h))
 reload_rect = pg.Rect((70, 10), (w, h))
 ranking_rect = pg.Rect((130, 10), (w, h))
+music_rect = pg.Rect((screen_width-80, 10), (w, h))
+
+ground = screen_height * 0.87 ## check
 
 gravity = 0.5
-drag = 0.5
+drag = 0.15
 
 block_images = {
     "wood": { "1": "media/images/blocks/wood100.png", "0.8": "media/images/blocks/wood80.png", "0.6": "media/images/blocks/wood60.png", "0.4": "media/images/blocks/wood40.png", "0.2": "media/images/blocks/wood20.png" },
@@ -99,7 +117,6 @@ bomb_damage = pg.image.load("media/images/bomb_damage.png").convert_alpha()
 
 # TO -DO :
 '''HIGH PRIORITY'''
-# - moving blocks customization
 # - let birds bounce - make bird.velocityy be negative when it hits the ground
 '''MEDIUM PRIORITY'''
 '''LOW PRIORITY'''

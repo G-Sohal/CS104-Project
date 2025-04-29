@@ -22,7 +22,7 @@ class Block :
         self.dir = 1
 
     def construct(self, screen) :
-        screen.blit(self.image, self.rect.topleft)
+        screen.blit(self.image, self.rect.bottomleft)
         # pg.draw.rect(screen, self.colour, self.rect, border_radius=5)
         # pg.draw.rect(screen, (100, 100, 100), self.rect, width=1, border_radius=5)
 

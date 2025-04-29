@@ -5,13 +5,9 @@ from modules.game_objects.catapult import *
 from modules.game_objects.fortress import *
 from modules.game_objects.bird import *
 from modules.game_over import ranking
-from data.constants import *
+from data import constants
 
-class Game:
-    screen_width = screen_width
-    screen_height = screen_height
-    screen = screen
-    background_image = background_image
+class Game :
     clock = pg.time.Clock()
 
     def __init__(self, players, mode, level, rows, cols):
@@ -21,8 +17,8 @@ class Game:
         self.rows = rows
         self.cols = cols
         self.moving = level > 0
-        self.catapults = [Catapult(60 + cols*50, self.screen_height*0.75, "left"), Catapult(self.screen_width - 120 - 50*cols, self.screen_height*0.75, "right")]
-        self.fortresses = [Fortress(20, self.screen_height*0.66, 3, 4, self.moving), Fortress(self.screen_width - 20 - 50*cols, self.screen_height*0.66, 3, 4, self.moving)]
+        self.catapults = [Catapult(150 + rows*50, constants.ground, "left"), Catapult(constants.screen_width - 220 - 50*rows, constants.ground, "right")]
+        self.fortresses = [Fortress(90, constants.ground - 50*(cols + 1), rows, cols, self.moving), Fortress(constants.screen_width - 90 - 50*rows, constants.ground - 50*(cols + 1), rows, cols, self.moving)]
         self.birds = [None, None]
         self.bird_list = []
         self.score = [0, 0]
@@ -35,32 +31,34 @@ class Game:
         self.special_effect_coordinates = []
         self.start_time = pg.time.get_ticks()
         self.pause_time = 0
+        constants.background_image = pg.transform.scale(constants.background_image, screen.get_size())
 
     def run(self):
         while self.running:
-            self.screen.blit(self.background_image, (0, 0))
-            self.screen.blit(pause_button, button_rect.topleft)
-            self.screen.blit(reload_button, reload_rect.topleft)
-            self.screen.blit(ranking_button, ranking_rect.topleft)
+            constants.screen.blit(constants.background_image, (0, 0))
+            constants.screen.blit(constants.pause_button, constants.button_rect.topleft)
+            constants.screen.blit(constants.reload_button, constants.reload_rect.topleft)
+            constants.screen.blit(constants.ranking_button, constants.ranking_rect.topleft)
+            constants.screen.blit(constants.music_button[int(constants.music)], constants.music_rect.topleft)
 
-            self.catapults[0].construct(self.screen)
-            self.catapults[1].construct(self.screen)
-            self.fortresses[0].construct(self.screen)
-            self.fortresses[1].construct(self.screen)
+            self.catapults[0].construct(constants.screen)
+            self.catapults[1].construct(constants.screen)
+            self.fortresses[0].construct(constants.screen)
+            self.fortresses[1].construct(constants.screen)
 
-            player_turn = font.render(f"{self.players[self.turn]}'s Turn", True, "black")
-            scoreboard = font.render(f"Score: {self.score[0] * 20 :.0f} - {self.score[1] * 20 :.0f}", True, "black")
+            player_turn = constants.font.render(f"{self.players[self.turn]}'s Turn", True, "black")
+            scoreboard = constants.font.render(f"Score: {self.score[0]} - {self.score[1]}", True, "black")
 
             if self.mode == 1:
                 time = int(60 - ((pg.time.get_ticks() - self.start_time - self.pause_time) / 1000))
                 colour = "black" if time > 10 else "red"
-                time_left = font.render(f"Time Left: {time}", True, colour)
+                time_left = constants.font.render(f"Time Left: {time}", True, colour)
                 if time <= 0:
                     ranking(self.players, self.score[0], self.score[1], True)
                     self.running = False
-                self.screen.blit(time_left, (self.screen_width//2 - (time_left.get_width())//2, self.screen_height//4 - 50))
-            self.screen.blit(player_turn, (self.screen_width//2 - (player_turn.get_width())//2, self.screen_height//4 - 100))
-            self.screen.blit(scoreboard, (self.screen_width//2 - (scoreboard.get_width())//2, self.screen_height//4 - 150))
+                constants.screen.blit(time_left, (constants.screen_width//2 - (time_left.get_width())//2, constants.screen_height//4 - 50))
+            constants.screen.blit(player_turn, (constants.screen_width//2 - (player_turn.get_width())//2, constants.screen_height//4 - 100))
+            constants.screen.blit(scoreboard, (constants.screen_width//2 - (scoreboard.get_width())//2, constants.screen_height//4 - 150))
 
             if self.birds[self.turn] is None:
                 self.projectile_coordinates = []
@@ -74,7 +72,7 @@ class Game:
                 if bird.special_effect_used: self.special_effect_coordinates.append(bird.rect.center)
                 elif not self.dragging: self.projectile_coordinates.append(bird.rect.center)
                 bird.update(self.level)
-                bird.draw(self.screen)
+                bird.draw(constants.screen)
 
             new_list = []
             for bird in self.bird_list:
@@ -82,48 +80,62 @@ class Game:
                 for block in self.fortresses[1 - self.turn].blocks[:]:
                     if bird.rect.colliderect(block.rect):
                         damage = bird.damage[block.type]
-                        self.score[self.turn] += damage
+                        self.score[self.turn] += int(damage*20)
                         if block.hit(damage):
                             self.fortresses[1 - self.turn].existing_blocks[block.row, block.col] = False
                             self.fortresses[1 - self.turn].blocks.remove(block)
                             for b in self.fortresses[1 - self.turn].blocks:
                                 if b.row == block.row and b.col <= block.col:
                                     b.falling = True
-                            self.score[self.turn] += 1
+                            self.score[self.turn] += 50
                         hit = True
                         break
                 if hit:
                     continue
                 if not bird.is_launched:
                     new_list.append(bird)
-                elif 0 <= bird.rect.centerx <= self.screen_width and bird.rect.bottom < self.screen_width:
+                elif 0 <= bird.rect.centerx <= constants.screen_width and bird.rect.bottom < constants.screen_height:
                     new_list.append(bird)
             self.bird_list = new_list
 
             if self.birds[self.turn] is not None and self.birds[self.turn].is_launched:
                 active_birds = [b for b in self.bird_list if b.turn == self.turn and b.is_launched]
-                if len(active_birds) == 0:
+                if len(active_birds) == 0 and self.birds[self.turn] is not None:
                     self.birds[self.turn] = None
                     self.turn = 1 - self.turn
+            # Check for fortress destruction
+            if not self.fortresses[0].blocks:
+                ranking(self.players, self.score[0], self.score[1], True)
+                self.running = False
+            if not self.fortresses[1].blocks:
+                ranking(self.players, self.score[0], self.score[1], True)
+                self.running = False
 
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.running = False
                 elif event.type == pg.VIDEORESIZE:
-                    self.screen_width = event.w
-                    self.screen_height = event.h
-                    self.screen = pg.display.set_mode((event.w, event.h), pg.RESIZABLE)
-                    self.background_image = pg.transform.scale(self.background_image, (event.w, event.h))
-                    self.catapults[0].rect.x = 60 + self.cols * 50
-                    self.catapults[0].rect.y = self.screen_height * 0.75
-                    self.catapults[1].rect.x = self.screen_width - 120 - 50 * self.cols
-                    self.catapults[1].rect.y = self.screen_height * 0.75
-                    self.fortresses[0].set_position(20, self.screen_height * 0.66)
-                    self.fortresses[1].set_position(self.screen_width - 20 - 50 * self.cols, self.screen_height * 0.66)
+                    constants.screen_width = event.w
+                    constants.screen_height = event.h
+                    constants.ground = event.h * 0.87
+                    constants.screen = pg.display.set_mode((event.w, event.h), pg.RESIZABLE)
+                    constants.background_image = pg.transform.scale(constants.background_image, (event.w, event.h))
+                    
+                    self.catapults[0].rect.x = 90 + self.cols * 50
+                    self.catapults[0].rect.y = constants.ground
+                    self.catapults[1].rect.x = constants.screen_width - 150 - 50 * self.cols
+                    self.catapults[1].rect.y = constants.ground
+
+                    self.birds[self.turn].rect.topleft = (self.catapults[self.turn].rect.centerx - 25, self.catapults[self.turn].rect.top - 10)
+                    
+                    self.fortresses[0].set_position(20, constants.ground - self.cols * 50)
+                    self.fortresses[1].set_position(constants.screen_width - 20 - 50 * self.cols, constants.ground - self.cols * 50)
+
                     self.dragging = False
                 elif event.type == pg.MOUSEBUTTONDOWN:
                     if button_rect.collidepoint(pg.mouse.get_pos()):
-                        self.screen.blit(resume_button, button_rect.topleft)
+                        pause_start = pg.time.get_ticks()
+                        constants.screen.blit(resume_button, button_rect.topleft)
                         paused = True
                         while paused:
                             for event in pg.event.get():
@@ -132,17 +144,21 @@ class Game:
                                     paused = False
                                 elif event.type == pg.MOUSEBUTTONDOWN:
                                     if button_rect.collidepoint(pg.mouse.get_pos()):
-                                        self.screen.blit(pause_button, button_rect.topleft)
+                                        constants.screen.blit(pause_button, button_rect.topleft)
                                         paused = False
                             pg.display.flip()
                             self.clock.tick(30)
+                        pause_end = pg.time.get_ticks()
+                        self.pause_time += pause_end - pause_start
                     elif reload_rect.collidepoint(pg.mouse.get_pos()):
-                        self.catapults = [Catapult(self.screen_width//60 + 200, self.screen_height*0.75, "left"), Catapult(self.screen_width - 360, self.screen_height*0.75, "right")]
-                        self.fortresses = [Fortress(self.screen_width//60, self.screen_height*0.66, 3, 4, self.moving), Fortress(self.screen_width - 160, self.screen_height*0.66, 3, 4, self.moving)]
+                        self.catapults = [Catapult(150 + self.rows*50, constants.ground, "left"), Catapult(constants.screen_width - 220 - 50*self.rows, constants.ground, "right")]
+                        self.fortresses = [Fortress(90, constants.ground - 50*(self.cols + 1), self.rows, self.cols, self.moving), Fortress(constants.screen_width - 90 - 50*self.rows, constants.ground - 50*(self.cols + 1), self.rows, self.cols, self.moving)]
                         self.birds = [None, None]
                         self.bird_list = []
                         self.score = [0, 0]
                         self.turn = 0
+                        self.start_time = pg.time.get_ticks()
+                        self.pause_time = 0
                         continue
                     elif ranking_rect.collidepoint(pg.mouse.get_pos()):
                         pause_start = pg.time.get_ticks()
@@ -151,11 +167,16 @@ class Game:
                         self.pause_time += pause_end - pause_start
                         if result == 'resume':
                             continue
-                        elif result == 'restart':
-                            pass
                         elif result == 'exit':
                             pg.quit()
                             exit()
+                    elif constants.music_rect.collidepoint(pg.mouse.get_pos()):
+                        if pg.mixer.music.get_busy():
+                            pg.mixer.music.pause()
+                            constants.music = False
+                        else:
+                            pg.mixer.music.unpause()    
+                            constants.music = True                    
                     elif self.birds[self.turn] and not self.birds[self.turn].is_launched:
                         self.drag_start = self.birds[self.turn].rect.center
                         self.dragging = True
@@ -196,16 +217,16 @@ class Game:
                     end_positiony = sling_y + dy
                     end_position = (end_positionx, end_positiony)
                     self.birds[self.turn].rect.center = (end_positionx, end_positiony)
-                    pg.draw.line(self.screen, (139, 69, 19), (sling_x - 10, sling_y), end_position, 3)
-                    pg.draw.line(self.screen, (139, 69, 19), (sling_x + 15, sling_y), end_position, 3)
+                    pg.draw.line(constants.screen, (139, 69, 19), (sling_x - 10, sling_y), end_position, 4)
+                    pg.draw.line(constants.screen, (139, 69, 19), (sling_x + 15, sling_y), end_position, 4)
                 elif self.birds[self.turn].is_launched:
                     for coord in self.projectile_coordinates:
-                        pg.draw.circle(self.screen, (255, 255, 255), coord, 3.5)
+                        pg.draw.circle(constants.screen, (255, 255, 255), coord, 3.5)
                     for coord in self.special_effect_coordinates:
                         if self.birds[self.turn].type == "Red":
-                            self.screen.blit(red_feathers[self.turn], coord)
+                            constants.screen.blit(red_feathers[self.turn], coord)
                         else:
-                            pg.draw.circle(self.screen, (255, 255, 255), coord, 3.5)
+                            pg.draw.circle(constants.screen, (255, 255, 255), coord, 3.5)
             pg.display.flip()
             self.clock.tick(60)
 

@@ -10,16 +10,17 @@ pg.display.set_caption("Angry Birds v2.0")
 
 score_sessions = []
 
-# start_button()
-# mode = mode()
-level = level()
-# players = player_names()
-# rows, cols = dimension_fortress()
-players = ["A", "B"]
-mode = 0
-level = 0
-rows = 4
-cols = 3
+front_menu = FrontMenu()
+front_menu.start_button() # add a loading thing
+mode = front_menu.mode()
+level = front_menu.level()
+players = front_menu.player_names()
+rows, cols = front_menu.dimension_fortress()
+
+# players = ["a", "b"]
+# mode = 0
+# level = 2
+
 game = Game(players, mode, level, rows, cols)
 score = game.run()
 score_sessions.append(score)
