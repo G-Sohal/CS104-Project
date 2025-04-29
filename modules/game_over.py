@@ -36,5 +36,10 @@ def ranking(players, score1, score2, done = False) :
                     return "resume"
                 elif event.key == pg.K_ESCAPE :
                     return "exit"
+            elif event.type == pg.VIDEORESIZE :
+                constants.screen_width = event.w
+                constants.screen_height = event.h
+                constants.screen = pg.display.set_mode((event.w, event.h), pg.RESIZABLE)
+                constants.game_over_background = pg.transform.scale(constants.game_over_background, (event.w, event.h))
         pg.display.flip()
  # Option  to go back is just wanted to see rankings mid-game

@@ -14,11 +14,11 @@ class Fortress :
         for i in range(width) :
             for j in range(height) :
                 self.blocks.append(Block(x + i*50, y + j*50, random.choice(["wood", "ice", "stone"]), i, j, moving))
-        self.existing_blocks = np.ones((width, height), dtype=bool)
+        # self.existing_blocks = np.ones((width, height), dtype=bool)
 
     def construct(self, screen) :
         for block in self.blocks:
-            if self.existing_blocks[block.row, block.col]:
+            # if self.existing_blocks[block.row, block.col]:
                 block.update()
                 block.construct(screen)
 

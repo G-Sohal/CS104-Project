@@ -4,13 +4,12 @@ from data import constants
 
 class FrontMenu :
     def dimension_fortress(self) :
-        constants.screen.blit(constants.front_bg_image, (0, 0))
-        constants.screen.blit(constants.music_button[int(constants.music)], constants.music_rect.topleft)
         statement_rows = "Enter the number of rows of the fortress :"
         statement_cols = "Enter the number of columns of the fortress :"
         running = True
         rows = ""
         cols = ""
+        # DEFAULT FIRST DIMENSION BEING DEFINED; CAN BE CHANGED AS MOUSE CLICKS ON COLS
         dim = "rows"
         while running :
                 constants.screen.blit(constants.front_bg_image, (0, 0))
@@ -87,6 +86,7 @@ class FrontMenu :
                                     cols += event.unicode
 
     def player_names(self):
+        # INITIALLY EMPTY STRINGS
         players = []
         name = ""
         running = True
@@ -142,8 +142,7 @@ class FrontMenu :
         return players
 
     def mode(self):
-        constants.screen.blit(constants.front_bg_image, (0, 0))
-        constants.screen.blit(constants.music_button[int(constants.music)], constants.music_rect.topleft)
+        title_surf = constants.font_heading.render("Choose a mode for the game :", True, "black")
         mode_text = [
             constants.font_heading.render("TIMED MODE", True, "black"),
             constants.font_heading.render("FORTRESS DESTRUCTION", True, "black")
@@ -155,6 +154,7 @@ class FrontMenu :
             constants.screen.blit(constants.front_bg_image, (0, 0))
             constants.screen.blit(constants.music_button[int(constants.music)], constants.music_rect.topleft)
 
+            constants.screen.blit(title_surf, (constants.screen_width//2 - title_surf.get_width()//2, 100))
             coordinates[0] = pg.Rect(constants.screen_width//2 - (mode_text[0].get_width())//2 - 10,
                                 constants.screen_height//2 - mode_text[0].get_height() - 100, 
                                 mode_text[0].get_width() + 20, 
@@ -195,10 +195,8 @@ class FrontMenu :
                             constants.music = True  
 
     def level(self):
-        constants.screen.blit(constants.front_bg_image, (0, 0))
-        constants.screen.blit(constants.music_button[int(constants.music)], constants.music_rect.topleft)
         running = True
-
+        main_title_surf = constants.font_heading.render("Select a level for the game :", True, "black")
         titles = ["EASY", "MEDIUM", "HARD"]
         descriptions = [
             "No wind effect",
@@ -214,21 +212,24 @@ class FrontMenu :
         coordinates = []
 
         while running:
+            # RENDERING BACKGROUND THEN THE BUTTON
             constants.screen.blit(constants.front_bg_image, (0, 0))
             coordinates.clear()
             constants.screen.blit(constants.music_button[int(constants.music)], constants.music_rect.topleft)
-
+            # RENDERING TEXT
+            constants.screen.blit(main_title_surf, (constants.screen_width//2 - main_title_surf.get_width()//2, 100))
             for i in range(3):
-                x = (constants.screen_width // 4) * (i + 1)
+                x = (constants.screen_width//4) * (i + 1)
 
-                title_surf = constants.font_heading.render(titles[i], True, "black")
-                desc_surf = constants.font.render(descriptions[i], True, "black")
+                title_surf = constants.font_heading.render(titles[i], True, "white")
+                desc_surf = constants.font.render(descriptions[i], True, "yellow")
                 subdesc_surf = constants.font.render(sub_descriptions[i], True, "black")
 
+                # ENSURING SUFFICIENT PADDING AND PROPER WIDTH AND HEIGHT
                 width = max(title_surf.get_width(), desc_surf.get_width(), subdesc_surf.get_width()) + 20
                 height = title_surf.get_height() + desc_surf.get_height() + subdesc_surf.get_height() + 30
 
-                rect = pg.Rect(x - width // 2, constants.screen_height // 2 - height // 2, width, height)
+                rect = pg.Rect(x - width//2, constants.screen_height//2 - height//2, width, height)
                 coordinates.append(rect)
 
                 color = (63, 191, 127) if rect.collidepoint(pg.mouse.get_pos()) else (45, 169, 106)
@@ -239,7 +240,8 @@ class FrontMenu :
                 constants.screen.blit(subdesc_surf, subdesc_surf.get_rect(centerx=rect.centerx, y=rect.y + 20 + title_surf.get_height() + desc_surf.get_height()))
 
             pg.display.flip()
-
+            
+            # HANDLING EVENTS LIKE SELECTION OF LEVEL
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     pg.quit()
@@ -266,12 +268,9 @@ class FrontMenu :
                             constants.music = True  
 
     def start_button(self) :
-        constants.screen.blit(constants.angry_birds_logo, (0, 0))
-        constants.screen.blit(constants.front_bg_image, (0, 0))
-        constants.screen.blit(constants.music_button[int(constants.music)], constants.music_rect.topleft)
-        
         running =  True
         while running :
+            # RENDERING BACKGROUND AND PLAY BUTTON
             constants.screen.blit(constants.front_bg_image, (0, 0))
             constants.screen.blit(constants.angry_birds_logo, (constants.screen_width*0.2, 30))
             constants.screen.blit(constants.music_button[int(constants.music)], constants.music_rect.topleft)
@@ -280,6 +279,7 @@ class FrontMenu :
 
             pg.display.flip()
 
+            # HANDLING EVENTS LIKE CLICKING ON PLAY BUTTON
             for event in pg.event.get() :
                 if event.type == pg.QUIT :
                     pg.quit()
@@ -303,8 +303,6 @@ class FrontMenu :
                             constants.music = True  
 
     def method(self) :
-        constants.screen.blit(constants.front_bg_image, (0, 0))
-        constants.screen.blit(constants.music_button[int(constants.music)], constants.music_rect.topleft)
         mode_text = [
             constants.font_heading.render("RANDOM DRAW", True, "black"),
             constants.font_heading.render("DECK MODE", True, "black")
@@ -315,7 +313,7 @@ class FrontMenu :
         while running:
             constants.screen.blit(constants.front_bg_image, (0, 0))
             constants.screen.blit(constants.music_button[int(constants.music)], constants.music_rect.topleft)
-
+            # EVALUATING CORRDINATES IN A LOOP IN CASE OF WINDOW RESIZING
             coordinates[0] = pg.Rect(constants.screen_width//2 - (mode_text[0].get_width())//2 - 10,
                                 constants.screen_height//2 - mode_text[0].get_height() - 100, 
                                 mode_text[0].get_width() + 20, 
@@ -325,6 +323,7 @@ class FrontMenu :
                                 mode_text[1].get_width() + 20, 
                                 mode_text[1].get_height() + 20)
 
+            # CHECKING IF MOUSE IS HOVERING THEN COLOUR MUST CHANGE
             for i in range(2):
                 color = (63, 191, 127) if coordinates[i].collidepoint(pg.mouse.get_pos()) else (45, 169, 106)
                 pg.draw.rect(constants.screen, color, (coordinates[i]), border_radius=10)
@@ -332,6 +331,7 @@ class FrontMenu :
 
             pg.display.flip()
 
+            # HANDLING VARIOUS EVENTS LIKE SELECTION OF METHOD
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     pg.quit()
@@ -344,9 +344,9 @@ class FrontMenu :
                     constants.music_rect = pg.Rect((constants.screen_width-80, 10), (constants.w, constants.h))
                 elif event.type == pg.MOUSEBUTTONDOWN:
                     if coordinates[0].collidepoint(event.pos):
-                        return 1
+                        return 0
                     elif coordinates[1].collidepoint(event.pos):
-                        return 2
+                        return 1
                     elif constants.music_rect.collidepoint(pg.mouse.get_pos()):
                         if pg.mixer.music.get_busy():
                             pg.mixer.music.pause()

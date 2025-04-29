@@ -66,5 +66,5 @@ class Bird:
                 self.original_image = self.image
                 return (self,)
             elif self.type == "Red" :
-                self.velocityx *= 2
+                self.velocityx *= 1.5
                 return (self,)

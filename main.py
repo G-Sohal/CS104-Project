@@ -22,6 +22,6 @@ method = front_menu.method()
 game = Game(players, mode, level, rows, cols, method)
 score = game.run()
 score_sessions.append(score)
-
+print(score)
 pg.quit()
 sys.exit()
