@@ -33,9 +33,9 @@ class Game :
                 pg.Rect(250, constants.ground + 5, constants.cw, constants.ch),
             ],
             1: [
-                pg.Rect(constants.screen_width - 300, constants.ground + 5, constants.w, constants.ch),
-                pg.Rect(constants.screen_width - 200, constants.ground + 5, constants.w, constants.ch),
-                pg.Rect(constants.screen_width - 100, constants.ground + 5, constants.w, constants.ch),
+                pg.Rect(constants.screen_width - 300, constants.ground + 5, constants.cw, constants.ch),
+                pg.Rect(constants.screen_width - 200, constants.ground + 5, constants.cw, constants.ch),
+                pg.Rect(constants.screen_width - 100, constants.ground + 5, constants.cw, constants.ch),
             ],
         }
         self.score = [0, 0]
@@ -186,9 +186,9 @@ class Game :
                                 pg.Rect(250, constants.ground + 5, constants.cw, constants.ch),
                             ],
                             1: [
-                                pg.Rect(constants.screen_width - 300, constants.ground + 5, constants.w, constants.ch),
-                                pg.Rect(constants.screen_width - 200, constants.ground + 5, constants.w, constants.ch),
-                                pg.Rect(constants.screen_width - 100, constants.ground + 5, constants.w, constants.ch),
+                                pg.Rect(constants.screen_width - 300, constants.ground + 5, constants.cw, constants.ch),
+                                pg.Rect(constants.screen_width - 200, constants.ground + 5, constants.cw, constants.ch),
+                                pg.Rect(constants.screen_width - 100, constants.ground + 5, constants.cw, constants.ch),
                             ],
                         }
                     if self.birds[self.turn] :
@@ -325,7 +325,7 @@ class Game :
                     pg.draw.line(constants.screen, (139, 69, 19), (sling_x + 15, sling_y), end_position, 4)
                 # DRAW THE TRAJECTORY
                 elif self.birds[self.turn].is_launched:
-                    # LEAVE A TRAIL OF WHITE CIRCLES - SPECIAL TRAJECTORY EFFECS
+                    # LEAVE A TRAIL OF WHITE CIRCLES - SPECIAL TRAJECTORY EFFECTS
                     for coord in self.projectile_coordinates:
                         pg.draw.circle(constants.screen, (255, 255, 255), coord, 3.5)
                     for coord in self.special_effect_coordinates:
