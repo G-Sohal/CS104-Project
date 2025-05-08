@@ -75,7 +75,7 @@ class Game :
             scoreboard = constants.font.render(f"Score: {self.score[0]} - {self.score[1]}", True, "black")
 
             # DISPLAY TIMER ONLY IF TIMED MODE WAS SELECTED
-            if self.mode == 1:
+            if self.mode == 0:
                 time = int(60 - ((pg.time.get_ticks() - self.start_time - self.pause_time) / 1000))
                 colour = "black" if time > 10 else "red"
                 time_left = constants.font.render(f"Time Left: {time}", True, colour)
